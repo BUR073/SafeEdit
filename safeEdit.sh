@@ -12,7 +12,7 @@ backupFile(){
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")  
 
     # Define backup dir path
-    local backupDir="./backup"
+    local backupDir="./backupBash"
 
     # Check if the file exists before attempting to back it up
     if [ ! -f "$filePath" ]; then
@@ -47,37 +47,37 @@ backupFile(){
         return 1
     fi
 
-    # Check number of lines in backupLog.txt
-    local numberOfLines=$(wc -l < backupLog.txt)
+    # Check number of lines in backupLogBash.txt
+    local numberOfLines=$(wc -l < backupLogBash.txt)
 
-    # Check if the backupLog.txt file exists
-    if [ ! -f "backupLog.txt" ]; then
+    # Check if the backupLogBash.txt file exists
+    if [ ! -f "backupLogBash.txt" ]; then
 
-        # Create a new backupLog if one doesn't exist
-        touch backupLog.txt
+        # Create a new backupLogBash if one doesn't exist
+        touch backupLogBash.txt
 
-        # Tell user new backupLog has been created
-        echo "backupLog.txt created"
+        # Tell user new backupLogBash has been created
+        echo "backupLogBash.txt created"
     fi
 
-    # If backupLog.txt has 5 lines, remove the first one (oldest entry)
+    # If backupLogBash.txt has 5 lines, remove the first one (oldest entry)
     if [ "$numberOfLines" -eq 5 ]; then
 
         # Check platform as the sed command syntax is different on macOS and linux
         if [[ "$OSTYPE" == "darwin"* ]]; then
 
             # For macOS
-            sed -i '' '1d' backupLog.txt
+            sed -i '' '1d' backupLogBash.txt
 
         else
 
             # For linux
-            sed -i '1d' backupLog.txt
+            sed -i '1d' backupLogBash.txt
         fi
     fi    
     
     # Write backup log to the file with timestamp
-    echo "[$timestamp] Backup created: $filePath → $backupFileName" >> backupLog.txt
+    echo "[$timestamp] Backup created: $filePath → $backupFileName" >> backupLogBash.txt
 
     # Tell user the backup has been created
     echo "Backup of $filePath created successfully at $timestamp"
@@ -133,5 +133,4 @@ else
     # Call the edit function with the filePath
     edit "$filePath"
 fi
-
 
