@@ -5,6 +5,11 @@ BEGIN
         # Create timestamp for the backup operation
         SET timestamp to the current date and time in the format "YYYY-MM-DD HH:MM:SS"
 
+        SET backupFolderDir to chosen backup folder directory
+        If backupFolder does not exist: 
+            CREATE folder at backupFolderDir 
+        ENDIF 
+        
         # Check if the file exists
         IF filePath does not exist:
             PRINT "Error: filePath does not exist"

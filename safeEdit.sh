@@ -14,6 +14,12 @@ backupFile(){
     # Define backup dir path
     local backupDir="./backupBash"
 
+    # Create backup file name by removing file extension and replacing it with .bak
+    local backupFileName="${filePath%.*}.bak"
+
+    # Check number of lines in backupLogBash.txt
+    local numberOfLines=$(wc -l < backupLogBash.txt)
+
     # Check if the file exists before attempting to back it up
     if [ ! -f "$filePath" ]; then
 
@@ -31,9 +37,6 @@ backupFile(){
         mkdir -p "$backupDir"
     fi
 
-    # Create backup file name by removing file extension and replacing it with .bak
-    backupFileName="${filePath%.*}.bak"
-
     # Create backup of file and save to backup folder
     cp "$filePath" "$backupDir/$(basename "$backupFileName")"
 
@@ -47,9 +50,6 @@ backupFile(){
         return 1
     fi
 
-    # Check number of lines in backupLogBash.txt
-    local numberOfLines=$(wc -l < backupLogBash.txt)
-
     # Check if the backupLogBash.txt file exists
     if [ ! -f "backupLogBash.txt" ]; then
 
@@ -60,7 +60,7 @@ backupFile(){
         echo "backupLogBash.txt created"
     fi
 
-    # If backupLogBash.txt has 5 lines, remove the first one (oldest entry)
+    # If backupLogBash.txt has 5 lines, remove the first one 
     if [ "$numberOfLines" -eq 5 ]; then
 
         # Check platform as the sed command syntax is different on macOS and linux
@@ -108,12 +108,12 @@ edit(){
     fi
 }
 
-# User welcome message
-echo "Welcome to the Safe Editor!"
 
 # Check if there is a command line argument
 if [ $# -eq 1 ]; then
 
+    # User welcome message
+    echo "Welcome to the Safe Editor!"
     # If exactly one argument is given, call edit function
     edit "$1"  
 
@@ -123,6 +123,9 @@ elif [ $# -gt 1 ]; then
     # Display error message too user
     echo "Error: Too many parameters entered."
 else
+
+    # User welcome message
+    echo "Welcome to the Safe Editor!"
 
     # Ask user which file they want to edit
     echo "Which file would you like to edit?"
