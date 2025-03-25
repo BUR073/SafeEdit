@@ -9,6 +9,9 @@ backupFile(){
     # Create timeStamp
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")  
 
+    # Define backup dir path
+    local backupDir="./backup"
+
     # Check if the file exists before attempting to back it up
     if [ ! -f "$filePath" ]; then
         echo "Error: $filePath does not exist"
@@ -17,11 +20,19 @@ backupFile(){
 
 
     backupFileName="${filePath%.*}.bak"
-    # Create backup of file
-    cp "$filePath" "$backupFileName"
+    # Create backup of file and save to backup folder
+    cp "$filePath" "$backupDir/$(basename "$backupFileName")"
+
 
     # Check number of lines in backupLog.txt
     local numberOfLines=$(wc -l < backupLog.txt)
+
+    # Check if the backupLog.txt file exists
+    if [ ! -f "backupLog.txt" ]; then
+        echo "backupLog.txt created"
+        # If it doesn't create one
+        touch backupLog.txt
+    fi
 
     # If backupLog.txt has 5 lines, remove the first one (oldest entry)
     if [ "$numberOfLines" -eq 5 ]; then
@@ -55,8 +66,7 @@ edit(){
     fi
 }
 
-echo "Welcome to the Safe Edit Bash Script!"
-echo "This script will allow you to safely edit a file with backup and logging."
+echo "Welcome to the Safe Editor!"
 
 # Check if there is a command line argument
 if [ $# -eq 1 ]; then
