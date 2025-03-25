@@ -15,8 +15,10 @@ backupFile(){
         return 1  # Exit the function if file does not exist
     fi
 
+
+    backupFileName="${filePath%.*}.bak"
     # Create backup of file
-    cp "$filePath" "$filePath.bak"
+    cp "$filePath" "$backupFileName"
 
     # Check number of lines in backupLog.txt
     local numberOfLines=$(wc -l < backupLog.txt)
@@ -29,7 +31,7 @@ backupFile(){
     fi    
     
     # Write backup log to the file with timestamp
-    echo "[$timestamp] Backup created: $filePath → $filePath.bak" >> backupLog.txt
+    echo "[$timestamp] Backup created: $filePath → $backupFileName" >> backupLog.txt
 
     echo "Backup of $filePath created successfully at $timestamp"
 }
