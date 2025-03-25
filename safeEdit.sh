@@ -18,11 +18,20 @@ backupFile(){
         return 1  # Exit the function if file does not exist
     fi
 
+    # Ensure backup directory exists
+    if [ ! -d "$backupDir" ]; then
+        mkdir -p "$backupDir"
+    fi
 
     backupFileName="${filePath%.*}.bak"
     # Create backup of file and save to backup folder
     cp "$filePath" "$backupDir/$(basename "$backupFileName")"
 
+    # Check if cp command was successful
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to create backup for $filePath"
+        return 1
+    fi
 
     # Check number of lines in backupLog.txt
     local numberOfLines=$(wc -l < backupLog.txt)
@@ -36,9 +45,14 @@ backupFile(){
 
     # If backupLog.txt has 5 lines, remove the first one (oldest entry)
     if [ "$numberOfLines" -eq 5 ]; then
-        # sed -i '1d' backupLog.txt --> Correct for linux, line below is just so i can test on mac
-        # For macOS, use this sed syntax to remove the first line
-        sed -i '' '1d' backupLog.txt
+        # Check platform as the sed command syntax is different on macOS and linux
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # For macOS
+            sed -i '' '1d' backupLog.txt
+        else
+            # For linux
+            sed -i '1d' backupLog.txt
+        fi
     fi    
     
     # Write backup log to the file with timestamp
@@ -58,8 +72,8 @@ edit(){
         # Backup the file
         backupFile "$filePath"
 
-        # Open vim editor 
-        vim $filePath
+        # Open vi editor 
+        vi $filePath
 
     else
         echo "Error: $filePath does not exist in the current directory."
@@ -80,7 +94,7 @@ else
     echo "Which file would you like to edit?"
 
     # Read into var filePath
-    read filePath 
+    read -r filePath 
 
     # Call the edit function with the filePath
     edit "$filePath"
