@@ -1,53 +1,67 @@
-1. INTRODUCTION
-    Print a welcome message that introduces the program to the user.
-    "Welcome to the safe file editor! This program allows you to edit files safely with backup."
+BEGIN
 
-2. DETERMINE OPERATION MODE
-    If there is a command-line argument (filename):
-        - Proceed to command-line mode.
-    Else:
-        - Proceed to interactive mode.
+    FUNCTION backupFile(filePath):
 
-3. INTERACTIVE MODE (no command-line argument)
-    a. Prompt the user: "What File Do You Wish to Edit?"
-    b. Read the filename input from the user.
-    c. Check if the file exists in the current directory:
-        - If the file exists:
-            i. Create a backup with ".bak" extension (overwrite if exists).
-            ii. Log the backup operation with a timestamp in "backup_log.txt".
-            iii. Open the file in a text editor (Notepad for MS-DOS, vi for Linux).
-        - Else:
-            i. Inform the user the file does not exist and exit.
+        # Create timestamp for the backup operation
+        SET timestamp to the current date and time in the format "YYYY-MM-DD HH:MM:SS"
 
-4. COMMAND-LINE MODE (filename argument given)
-    a. If more than one command-line argument is provided:
-        - Print error: "Too many parameters entered."
-        - Exit the program.
-    b. If exactly one argument is provided:
-        - Extract the filename from the command-line parameter.
-        - Check if the file exists in the current directory:
-            i. If the file exists:
-                - Create a backup with ".bak" extension (overwrite if exists).
-                - Log the backup operation with a timestamp in "backup_log.txt".
-                - Open the file in a text editor (Notepad for MS-DOS, vi for Linux).
-            ii. Else:
-                - Inform the user the file does not exist and exit.
+        # Check if the file exists
+        IF filePath does not exist:
+            PRINT "Error: filePath does not exist"
+            RETURN 1  # Exit the function if file does not exist
+        END IF
 
-5. BACKUP AND LOGGING
-    a. When a backup is created:
-        - Copy the original file to a new file with a ".bak" extension.
-        - Log the backup creation with timestamp in the log file.
-        - Ensure the log file does not exceed 5 entries:
-            - If the log file has more than 5 entries, delete the oldest entry.
-        - Log format: "[YYYY-MM-DD HH:MM:SS] Backup created: filename → filename.bak"
+        SET backupFileName to the filePath with its extension replaced by .bak
 
-6. LOG MANAGEMENT
-    a. Open "backup_log.txt" for appending.
-    b. Append a new entry with the timestamp and backup details.
+        COPY filePath to backupFileName
 
-7. FINALIZATION
-    a. After completing the backup and file editing process, end the program.
-    b. If the user successfully edits the file, print a confirmation message: "File edited successfully."
-    c. If there are any errors or issues (e.g., file not found), print an error message: "Error: File not found."
+        SET numberOfLines to the number of lines in backupLog.txt
+
+        IF numberOfLines equals 5:
+            REMOVE the first line from backupLog.txt
+        END IF
+
+        APPEND timestamp + "Backup created:" + filePath + " → " + backupFileName + "to backupLog.txt"
+
+        PRINT "Backup of filePath created successfully at timestamp"
+    END FUNCTION
+
+
+    FUNCTION edit(filePath):
+
+        IF filePath exists:
+
+            CALL backupFile(filePath)
+
+            OPEN filePath in vim editor
+
+        ELSE
+
+            PRINT "Error: filePath does not exist in the current directory."
+
+        END IF
+    END FUNCTION
+
+
+    PRINT "Welcome to the Safe Edit Bash Script!"
+    PRINT "This script will allow you to safely edit a file with backup and logging."
+
+    IF exactly 1 command-line argument is given:
+
+        CALL edit() with the argument passed
+
+    ELSE IF more than 1 argument is given:
+
+
+        PRINT "Error: Too many parameters entered."
+    ELSE:
+
+        PRINT "Which file would you like to edit?"
+
+
+        READ filePath from user input
+
+        CALL edit with the user-provided filePath
+    END IF
 
 END
