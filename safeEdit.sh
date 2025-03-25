@@ -17,9 +17,6 @@ backupFile(){
     # Create backup file name by removing file extension and replacing it with .bak
     local backupFileName="${filePath%.*}.bak"
 
-    # Check number of lines in backupLogBash.txt
-    local numberOfLines=$(wc -l < backupLogBash.txt)
-
     # Check if the file exists before attempting to back it up
     if [ ! -f "$filePath" ]; then
 
@@ -47,7 +44,7 @@ backupFile(){
         echo "Error: Failed to create backup for $filePath"
 
         # Exit program
-        return 1
+        exit 0
     fi
 
     # Check if the backupLogBash.txt file exists
@@ -58,7 +55,13 @@ backupFile(){
 
         # Tell user new backupLogBash has been created
         echo "backupLogBash.txt created"
+
+        # Give the user a chance to read the echo message
+        sleep 2
     fi
+
+    # Check number of lines in backupLogBash.txt
+    local numberOfLines=$(wc -l < backupLogBash.txt)
 
     # If backupLogBash.txt has 5 lines, remove the first one 
     if [ "$numberOfLines" -eq 5 ]; then
