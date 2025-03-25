@@ -58,15 +58,4 @@ BEGIN
     ELSE IF more than 1 argument is given:
 
 
-        PRINT "Error: Too many parameters entered."
-    ELSE:
-
-        PRINT "Which file would you like to edit?"
-
-
-        READ filePath from user input
-
-        CALL edit with the user-provided filePath
-    END IF
-
-END
+        PRINT "Error: Too many parameters entere

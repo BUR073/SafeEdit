@@ -5,7 +5,7 @@
 # backup file function
 backupFile(){
 
-    # Define filePath var
+    # Define filePath var as the file path that was passed to the function
     local filePath="$1"  
 
     # Create timeStamp
@@ -81,6 +81,9 @@ backupFile(){
 
     # Tell user the backup has been created
     echo "Backup of $filePath created successfully at $timestamp"
+
+    # Sleep to give the user a chance to read the above echo line
+    sleep 2
 }
 
 
@@ -99,7 +102,8 @@ edit(){
         
             # Show user error message if vi failed to open the file
             echo "Error: Failed to open $filePath with vi."
-        fi   
+
+        fi    
 
     else
 
