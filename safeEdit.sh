@@ -94,8 +94,12 @@ edit(){
         # Backup the file
         backupFile "$filePath"
 
-        # Open vi editor 
-        vi $filePath
+        # Open vi editor
+        if ! vi "$filePath"; then
+        
+            # Show user error message if vi failed to open the file
+            echo "Error: Failed to open $filePath with vi."
+        fi   
 
     else
 
