@@ -1,117 +1,144 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: backupFile function
+:: Safe Edit Batch Script
+
+:: Main program execution starts here
+goto :main
+
+:: backup file function
 :backupFile
 
-:: set filePath to the var passed into the function
-set filePath=%1
+:: Define filePath var as the file path that was passed to the function
+set "filePath=%~1"
 
-:: Create a timestamp 
-for /f "tokens=1-4 delims=/- " %%a in ('date /t') do (
-    set day=%%a
-    set month=%%b
-    set year=%%c
+:: Create timeStamp
+for /f "tokens=1-6 delims=/: " %%a in ('echo %date% %time%') do (
+    set "timestamp=%%c-%%a-%%b %%d:%%e:%%f"
 )
-for /f "tokens=1-2 delims=: " %%a in ('time /t') do (
-    set hour=%%a
-    set minute=%%b
-)
-set timestamp=%year%-%month%-%day% %hour%:%minute%
 
 :: Define backup dir path
-set backupDir=backupBatch
+set "backupDir=.\backupBatch"
 
-:: Check if the file exists before attempting to back it up
-if not exist "%filePath%" (
-    echo Error: %filePath% does not exist
-    goto :eof
-)
+:: Create backup file name by removing file extension and replacing it with .bak
+for %%i in ("%filePath%") do set "backupFileName=%%~ni.bak"
 
 :: Ensure backup directory exists
 if not exist "%backupDir%" (
+
+    :: Create folder if it doesn't exist
     mkdir "%backupDir%"
 )
 
-:: Create backup file name by removing the extension and adding .bak
-set backupFileName=%filePath:.bak=%
-set backupFileName=%backupFileName%.bak
-
 :: Create backup of file and save to backup folder
-copy "%filePath%" "%backupDir%\%backupFileName%"
+copy "%filePath%" "%backupDir%\%backupFileName%" >nul
 
-:: Check if the copy command was successful
+:: Check if copy command was successful
 if errorlevel 1 (
+
+    :: Show error message to user
     echo Error: Failed to create backup for %filePath%
+
+    :: Exit function
     goto :eof
 )
+:: Check if the backupLogBatch.txt file exists
+if not exist "backupLogBatch.txt" (
 
-:: Check the number of lines in backupLogBash.txt
-set /a numberOfLines=0
-for /f "delims=" %%a in (backupLogBash.txt) do set /a numberOfLines+=1
+    :: Create a new backupLogBatch if one doesn't exist
+    type nul > backupLogBatch.txt
 
-:: Check if backupLogBash.txt exists
-if not exist backupLogBash.txt (
-    echo backupLogBash.txt created
-    echo. > backupLogBash.txt
+    :: Tell user new backupLogBatch has been created
+    echo backupLogBatch.txt created
+
+    :: Give the user a chance to read the echo message
+    timeout /t 2 >nul
 )
 
-:: If backupLogBash.txt has 5 lines, remove the first one (oldest entry)
-if %numberOfLines% geq 5 (
-    for /f "skip=1 delims=" %%a in (backupLogBash.txt) do echo %%a >> tempLog.txt
-    move /y tempLog.txt backupLogBash.txt
+:: Check number of lines in backupLogBatch.txt
+for /f %%a in ('type "backupLogBatch.txt" ^| find /c /v ""') do set "numberOfLines=%%a"
+
+:: If backupLogBatch.txt has 5 lines, ::ove the first one
+if "%numberOfLines%"=="5" (
+
+    :: Create a temporary file without the first line
+    more +1 "backupLogBatch.txt" > "backupLogBatch.tmp"
+
+    :: Replace the original file with the temp file
+    move /y "backupLogBatch.tmp" "backupLogBatch.txt" >nul
 )
 
 :: Write backup log to the file with timestamp
-echo [%timestamp%] Backup created: %filePath% → %backupFileName% >> backupLogBash.txt
+echo [%timestamp%] Backup created: %filePath% → %backupFileName% >> backupLogBatch.txt
 
 :: Tell user the backup has been created
 echo Backup of %filePath% created successfully at %timestamp%
-goto :eof
 
+:: Sleep to give the user a chance to read the above echo line
+timeout /t 2 >nul
+
+goto :eof
 
 :: edit function
 :edit
-set filePath=%1
 
-:: Check if the file exists in the current directory
+set "filePath=%~1"
+:: Check whether the filepath exists in the current dir
+
 if exist "%filePath%" (
+    :: Backup the file
 
-    :: Backup the file 
     call :backupFile "%filePath%"
+    :: Open notepad editor (since vi isn't standard on Windows)
 
-    :: Try to open the file with a text editor 
-    start "" notepad "%filePath%"
+    start /wait notepad "%filePath%"
 
-    :: Check if the editor failed to open
     if errorlevel 1 (
-        echo Error: Failed to open %filePath% with Notepad.
+
+        :: Show user error message if notepad failed to open the file
+        echo Error: Failed to open %filePath% with notepad.
+    )
+) else (
+
+    :: Give user warning message saying the file doesn't exist
+    echo Error: %filePath% does not exist in the current directory.
+)
+goto :eof
+
+:main
+
+:: Check if there is a command line argument
+if "%~1" neq "" (
+
+    if "%~2" equ "" (
+
+        :: User welcome message
+        echo Welcome to the Safe Editor!
+
+        :: If exactly one argument is given, call edit function
+        call :edit "%~1"
+
+    ) else (
+        :: If more than one argument is given
+        :: Display error message to user
+        echo Error: Too many parameters entered.
     )
 
 ) else (
-    echo Error: %filePath% does not exist in the current directory.
-)
+    :: User welcome message
+    echo Welcome to the Safe Editor!
 
-goto :eof
-
-:: Main Script Execution
-echo Welcome to the Safe Editor!
-
-:: Check if there is a command line argument
-if "%1"=="" (
-    :: If no argument, prompt user for file
+    :: Ask user which file they want to edit
+    echo.
     echo Which file would you like to edit?
+    :: Read into var filePath
     set /p filePath=
-
+        
+    :: Call the edit function with the filePath
     call :edit "!filePath!"
-
-) else if "%2"=="" (
-    :: If exactly one argument is given, call edit function
-    call :edit "%1"
-
-) else (
-    :: If more than one argument is given, show error
-    echo Error: Too many parameters entered.
+    
 )
 
-pause
+:end
+echo Thank you for using Safe Editor!
+endlocal

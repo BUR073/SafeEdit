@@ -17,16 +17,6 @@ backupFile(){
     # Create backup file name by removing file extension and replacing it with .bak
     local backupFileName="${filePath%.*}.bak"
 
-    # Check if the file exists before attempting to back it up
-    if [ ! -f "$filePath" ]; then
-
-        # Show user error message
-        echo "Error: $filePath does not exist"
-
-        # Exit the function if file does not exist
-        return 1  
-    fi
-
     # Ensure backup directory exists
     if [ ! -d "$backupDir" ]; then
 
