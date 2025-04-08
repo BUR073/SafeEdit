@@ -12,7 +12,7 @@ backupFile(){
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")  
 
     # Define backup dir path
-    local backupDir="./backupBash"
+    local backupDir="./backup"
 
     # Create backup file name by removing file extension and replacing it with .bak
     local backupFileName="${filePath%.*}.bak"
@@ -37,40 +37,40 @@ backupFile(){
         exit 0
     fi
 
-    # Check if the backupLogBash.txt file exists
-    if [ ! -f "backupLogBash.txt" ]; then
+    # Check if the backup_log.txt file exists
+    if [ ! -f "backup_log.txt" ]; then
 
         # Create a new backupLogBash if one doesn't exist
-        touch backupLogBash.txt
+        touch backup_log.txt
 
         # Tell user new backupLogBash has been created
-        echo "backupLogBash.txt created"
+        echo "backup_log.txt created"
 
         # Give the user a chance to read the echo message
         sleep 2
     fi
 
-    # Check number of lines in backupLogBash.txt
-    local numberOfLines=$(wc -l < backupLogBash.txt)
+    # Check number of lines in backup_log.txt
+    local numberOfLines=$(wc -l < backup_log.txt)
 
-    # If backupLogBash.txt has 5 lines, remove the first one 
+    # If backup_log.txt has 5 lines, remove the first one 
     if [ "$numberOfLines" -eq 5 ]; then
 
         # Check platform as the sed command syntax is different on macOS and linux
         if [[ "$OSTYPE" == "darwin"* ]]; then
 
             # For macOS
-            sed -i '' '1d' backupLogBash.txt
+            sed -i '' '1d' backup_log.txt
 
         else
 
             # For linux
-            sed -i '1d' backupLogBash.txt
+            sed -i '1d' backup_log.txt
         fi
     fi    
     
     # Write backup log to the file with timestamp
-    echo "[$timestamp] Backup created: $filePath → $backupFileName" >> backupLogBash.txt
+    echo "[$timestamp] Backup created: $filePath → $backupFileName" >> backup_log.txt
 
     # Tell user the backup has been created
     echo "Backup of $filePath created successfully at $timestamp"

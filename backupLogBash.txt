@@ -1,5 +1,0 @@
-[2025-03-25 14:41:31] Backup created: test.txt → test.bak
-[2025-03-25 14:50:19] Backup created: test.txt → test.bak
-[2025-03-25 20:18:04] Backup created: test.txt → test.bak
-[2025-03-25 20:54:14] Backup created: fail.txt → fail.bak
-[2025-03-25 20:54:50] Backup created: fail.txt → fail.bak
